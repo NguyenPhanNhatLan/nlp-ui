@@ -12,8 +12,10 @@ import type {
   IeUiCard,
   TabKey,
   ModelConfig,
+  IeResultData,
 } from "@/lib/pipeline/types";
 import { buildSaveCorrectionsPayload, fetchStepData } from "@/lib/pipeline/utils";
+
 
 type BackendEnvelope<T> = { status: number; message?: string; data: T };
 
@@ -115,30 +117,34 @@ export function NerTab({
               const resp = (await fetchStepData(
                 "/api/ie/from-fe",
                 payload
-              )) as BackendEnvelope<NerSaveData>;
-
+              )) as BackendEnvelope<any>;
+              console.log(resp)
               setSaveResp(resp);
 
               const data = (resp as any)?.data;
 
               if (!data) return;
 
-              // 1) ✅ set lại outputs.predict = re_formatted
               setOutputs((prev) => ({
                 ...prev,
                 predict: {
                   status: 200,
                   step: "result",
                   message: "OK",
-                  data: data.re_formatted,
+                  data: {
+                    model_name: payload.model_name,
+                    model_version: payload.model_version,
+                    raw: data, // nhét toàn bộ raw để debug
+                    ui: data.ui, // { cards: ... } (nếu backend trả đúng)
+                  },
                 } as any,
               }));
 
           
               onResultOverride({
-                structured: data.structured,
-                cards: data.ui.cards,
-                model: data.model,
+                structured: data.structured_doc ?? data.structured, // doc-level ưu tiên
+                cards: data.ui?.cards ?? data.ui?.ui?.cards ?? [],  // tuỳ shape bạn đang trả
+                model: data.model ?? { name: payload.model_name, version: payload.model_version },
               });
 
               // 3) optional: nhảy sang tab result luôn

@@ -44,6 +44,7 @@ export function buildPayload(
 
     case "ner":
       return { text: input };
+
     case "predict":
       return {
         text: normText,
@@ -98,7 +99,6 @@ export function pickPredictRelations(predict: PredictOutput | null | undefined):
   const cards = data?.ui?.cards;
   if (cards) return cards;
 
-  // fallback
   return data?.raw ?? data ?? null;
 }
 
@@ -111,8 +111,8 @@ export function buildSaveCorrectionsPayload(args: {
 
   return {
     text: input, // 
-    model_name: modelConfig.re.model_name,  // ✅ RE model
+    model_name: modelConfig.re.model_name,  
     model_version: modelConfig.re.model_version,
-    entities_output: editedEntitiesOutput,        // ✅ bắt buộc
+    entities_output: editedEntitiesOutput,       
   };
 }

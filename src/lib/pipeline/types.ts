@@ -18,6 +18,9 @@ export interface NormalizeOutput {
 
 // ===== NER (raw + ui) =====
 export type NerEntityType = string;
+export interface NerEnvelope {
+  entities: NerSentenceEntities[];
+}
 
 export interface NerSentenceEntities {
   text: string;
@@ -53,11 +56,13 @@ export interface NerModelInfo {
 
 export interface NerOutput {
   status: number;
+  message?: string;
   model?: NerModelInfo;
+
   entities: NerSentenceEntities[];
+  entities_output?: NerEnvelope;
   ui?: NerUiSentence[];
 }
-
 export interface ValidateOutput {
   entities: unknown[];
 }
@@ -82,12 +87,23 @@ export interface IeUiCard {
   source?: { sentence_id: string; sentence: string };
   sections: IeUiSection[];
 }
+export interface IeRawDebug {
+  input?: { text: string; normalized_text: string };
+  model?: { name: string; version: string };
+  entity_pairs?: unknown[];
+  re_output?: unknown[];
+  re_formatted?: unknown[];
+  structured?: unknown[];
+  structured_doc?: unknown[];
+}
+
 export interface IeResultData {
   model_name: string;
   model_version: string;
-  raw?: unknown;
+  raw?: IeRawDebug;
   ui?: { type?: string; cards: IeUiCard[] };
 }
+
 export interface PredictOutput {
   status: number;
   step?: string;
